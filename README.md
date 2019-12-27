@@ -17,10 +17,10 @@ __Lancer pour production__
 
 	$ quasar build
 
-![Connexion](https://github.com/ekergreis/vue_gallery_frontend/img/demo_connexion.png)
-![Accueil Best-of](https://github.com/ekergreis/vue_gallery_frontend/img/demo_bestof.png)
-![Galerie](https://github.com/ekergreis/vue_gallery_frontend/img/demo_galerie.png)
-![Diaporama](https://github.com/ekergreis/vue_gallery_frontend/img/demo_diaporama.png)
-![Commentaires](https://github.com/ekergreis/vue_gallery_frontend/img/demo_comment.png)
+![Connexion](https://raw.githubusercontent.com/ekergreis/vue_gallery_frontend/master/img/demo_connexion.png)
+![Accueil Best-of](https://raw.githubusercontent.com/ekergreis/vue_gallery_frontend/master/img/demo_bestof.png)
+![Galerie](https://raw.githubusercontent.com/ekergreis/vue_gallery_frontend/master/img/demo_galerie.png)
+![Diaporama](https://raw.githubusercontent.com/ekergreis/vue_gallery_frontend/master/img/demo_diaporama.png)
+![Commentaires](https://raw.githubusercontent.com/ekergreis/vue_gallery_frontend/master/img/demo_comment.png)
 
 *Auteur : Emmanuel Kergreis*
