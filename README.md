@@ -2,10 +2,12 @@
 
 __Interface web réalisée en Vue.JS (Quasar) se connectant aux web services du projet ["ekergreis/laravel_gallery_ws"](https://github.com/ekergreis/laravel_gallery_ws) pour gérer et afficher des galeries photos sécurisées.__
 
+*Cette interface est en cours de développements. Les fonctionnalités d'affichage ont été réalisées, les remontées du frontend pour insertion dans la base de données restent à réaliser.*
+
 ### Récupération sources et installation :
 
-  $ git clone https://github.com/ekergreis/vue_gallery_frontend.git
-  $ npm install
+	$ git clone https://github.com/ekergreis/vue_gallery_frontend.git
+	$ npm install
 
 __Configuration clés clients OAuth et URL dans fichier : config/auth.js__
 
