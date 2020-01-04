@@ -18,8 +18,8 @@
 
         <q-space/>
         <div style="margin-right: 30px">{{ this.user }}</div>
-        <q-btn v-if="affBtnAdmin" flat round dense icon="group_add" />
-        <q-btn v-if="affBtnAdmin" flat round dense icon="person_add" />
+        <q-btn v-if="affBtnAdmin" flat round dense icon="group_add"  @click="affGroup = true" />
+        <q-btn v-if="affBtnAdmin" flat round dense icon="person_add" @click="affUser = true" />
       </q-toolbar>
     </q-header>
 
@@ -72,22 +72,47 @@
 
     <q-page-container>
       <router-view />
+
+    <q-dialog full-height v-if="affBtnAdmin" v-model="affFenComptes">
+      <q-card style="max-width: 500px;width:400px">
+        <q-card-section class="row items-center">
+          <div v-if="affUser" class="text-h6 ">Création compte utilisateur</div>
+          <div v-if="affGroup" class="text-h6">Gestion groupes</div>
+          <q-space />
+          <q-btn icon="close" flat round dense v-close-popup />
+        </q-card-section>
+        <q-card-section>
+          <add-user v-if="affUser"/>
+          <add-group v-if="affGroup"/>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+
     </q-page-container>
   </q-layout>
 </template>
 
 <script>
 import { Notify } from 'quasar';
+import AddUser from 'components/AddUser';
+import AddGroup from 'components/AddGroup';
 import API from '../api/routes';
 
 export default {
   name: 'MyLayout',
+  components: {
+    AddUser,
+    AddGroup,
+  },
   data() {
     return {
       leftDrawerOpen: false,
       APIRoutes: API,
       user: '',
       detMenu: '',
+
+      affUser: false,
+      affGroup: false,
     };
   },
   mounted() {
@@ -106,6 +131,17 @@ export default {
     // Indicateur du role pour afficher boutons ajouter utilisateur ou groupe
     affBtnAdmin() {
       return this.$oauth.isAdmin();
+    },
+    // Indicateur d'affichage de la fenêtre gestion de comptes ou groupes
+    affFenComptes: {
+      get() {
+        if (this.affUser || this.affGroup) return true;
+        return false;
+      },
+      set() {
+        this.affUser = false;
+        this.affGroup = false;
+      },
     },
   },
   methods: {

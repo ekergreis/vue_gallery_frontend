@@ -24,5 +24,9 @@ __Lancer pour production__
 ![Galerie](https://raw.githubusercontent.com/ekergreis/vue_gallery_frontend/master/img/demo_galerie.png)
 ![Diaporama](https://raw.githubusercontent.com/ekergreis/vue_gallery_frontend/master/img/demo_diaporama.png)
 ![Commentaires](https://raw.githubusercontent.com/ekergreis/vue_gallery_frontend/master/img/demo_comment.png)
+![Config Utilisateur](https://raw.githubusercontent.com/ekergreis/vue_gallery_frontend/master/img/demo_user.png)
+![Config Nouveau Groupe](https://raw.githubusercontent.com/ekergreis/vue_gallery_frontend/master/img/demo_groupe_new.png)
+![Config Groupe Existant](https://raw.githubusercontent.com/ekergreis/vue_gallery_frontend/master/img/demo_groupe_exist.png)
+
 
 *Auteur : Emmanuel Kergreis*

@@ -1,5 +1,5 @@
 <template>
-  <div >
+  <div>
     <q-chat-message v-for="item in comments" :key="item.id"
       :name="item.nom"
       :text="[item.texte]"
