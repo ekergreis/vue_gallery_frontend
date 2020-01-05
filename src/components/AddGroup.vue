@@ -52,8 +52,8 @@ export default {
   name: 'AddGroup',
   data() {
     return {
-      lstGroup: null,
-      lstUsers: null,
+      lstGroup: [],
+      lstUsers: [],
       form: {
         groupNew: '',
         groupSelect: {
@@ -63,6 +63,31 @@ export default {
         users: [],
       },
     };
+  },
+  watch: {
+    // Changement saisie nouveau groupe => gestion users
+    'form.groupNew': {
+      handler(newVal, oldVal) {
+        if (oldVal !== '' && newVal === '') {
+          this.form.users = [];
+        }
+      },
+      deep: true,
+    },
+    // Changement sélection groupe => gestion users
+    'form.groupSelect': {
+      handler() {
+        this.form.users = [];
+        if (this.form.groupSelect.name) {
+          this.lstGroup.forEach((group) => {
+            if (this.form.groupSelect.id === group.id) {
+              this.form.users = group.users;
+            }
+          });
+        }
+      },
+      deep: true,
+    },
   },
   mounted() {
     // Chargement des infos groupes / users
@@ -79,6 +104,7 @@ export default {
         this.lstGroup.push({
           id: group.id,
           name: group.name,
+          users: group.users,
         });
       });
 
