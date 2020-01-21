@@ -73,7 +73,8 @@
     <q-page-container>
       <router-view />
 
-    <q-dialog full-height v-if="affBtnAdmin" v-model="affFenComptes">
+    <q-dialog full-height v-if="affBtnAdmin"
+              v-model="affFenComptes" >
       <q-card style="max-width: 500px;width:400px">
         <q-card-section class="row items-center">
           <div v-if="affUser" class="text-h6 ">Création compte utilisateur</div>
@@ -82,8 +83,8 @@
           <q-btn icon="close" flat round dense v-close-popup />
         </q-card-section>
         <q-card-section>
-          <add-user v-if="affUser"/>
-          <add-group v-if="affGroup"/>
+          <add-user v-if="affUser" @hideFen="hideFenComptes" />
+          <add-group v-if="affGroup" @hideFen="hideFenComptes" />
         </q-card-section>
       </q-card>
     </q-dialog>
@@ -159,6 +160,11 @@ export default {
         // [OAUTH] Redirection vers route Login
         this.$router.replace('/login');
       }, timeout);
+    },
+    // Déclenchement fermeture fenêtre comptes (users/groupes)
+    hideFenComptes() {
+      this.affUser = false;
+      this.affGroup = false;
     },
   },
 };

@@ -13,7 +13,8 @@ export default {
   TOKEN_URL: `${BASE_TOKEN}login`,
   endpoints: {
     MENU_URL: `${API_URL}galeries`,
-    GROUPS_INFOS_URL: `${API_URL}groups`,
+    USERS_ADD_URL: `${API_URL}signup`,
+    GROUPS_URL: `${API_URL}groups`,
     GALERIE_URL: `${API_URL}images`,
     COMMENTS_URL: `${API_URL}comments`,
     LOGOUT_URL: `${API_URL}logout`,

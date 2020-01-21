@@ -1,51 +1,50 @@
 <template>
   <div>
     <div class="q-gutter-y-md">
-      <form @submit.prevent="handleSubmit(addGroup)">
+      <q-input outlined v-model="form.groupNew" label="Nouveau groupe"
+                         v-if="!form.groupSelect.name"
+                         dense class="q-py-xs" />
 
-          <q-input outlined v-model="form.groupNew" label="Nouveau groupe"
-            v-if="!form.groupSelect.name"
-            dense class="q-py-xs" />
+      <q-select dense class="q-pb-xs"
+                v-if="!form.groupNew"
+                outlined label="Sélection groupe"
+                v-model="form.groupSelect"
+                :options="lstGroup"
+                option-value="id"
+                option-label="name"
+                input-debounce="0" />
 
-          <q-select dense class="q-pb-xs"
-            v-if="!form.groupNew"
-            outlined label="Sélection groupe"
-            v-model="form.groupSelect"
-            :options="lstGroup"
-            option-value="id"
-            option-label="name"
-            input-debounce="0" />
+      <div class="q-pa-xs">
+        <q-option-group
+          v-model="form.users"
+          :options="lstUsers"
+          color="green" type="toggle" dense
+        />
+      </div>
 
-          <div class="q-pa-xs">
-            <q-option-group
-              v-model="form.users"
-              :options="lstUsers"
-              color="green" type="toggle" dense
-            />
-          </div>
-
-          <div class="row float-right">
-            <div class="q-pa-xs">
-              <q-btn v-if="form.groupNew || form.groupSelect.name"
-                type="submit" dense class="bg-primary text-white">
-                {{ form.groupSelect.name ? 'Modifier' : 'Valider' }} groupe
-              </q-btn>
-            </div>
-            <div class="q-pa-xs">
-              <q-btn v-if="form.groupSelect.name" type="submit" dense class="bg-red text-white">
-                Supprimer groupe
-              </q-btn>
-            </div>
-          </div>
-
-          <q-space/>
-      </form>
+      <div class="row float-right">
+        <div class="q-pa-xs">
+          <q-btn v-if="form.groupNew || form.groupSelect.name"
+                 @click="addGroup()" dense class="bg-primary text-white">
+            {{ form.groupSelect.name ? 'Modifier' : 'Valider' }} groupe
+          </q-btn>
+        </div>
+        <div class="q-pa-xs">
+          <q-btn v-if="form.groupSelect.name"
+                 @click="delGroup()" dense class="bg-red text-white">
+            Supprimer groupe
+          </q-btn>
+        </div>
+      </div>
+      <q-space/>
     </div>
   </div>
 </template>
 
 <script>
 // GESTION GROUP
+import Http from 'axios';
+import { Notify } from 'quasar';
 import API from '../api/routes';
 
 export default {
@@ -92,7 +91,7 @@ export default {
   mounted() {
     // Chargement des infos groupes / users
     (async () => {
-      const response = await this.$oauth.getAPI(API.endpoints.GROUPS_INFOS_URL);
+      const response = await this.$oauth.getAPI(API.endpoints.GROUPS_URL);
 
       // Chargement liste groupes existant
       this.lstGroup = [];
@@ -119,9 +118,54 @@ export default {
     })();
   },
   methods: {
+    addGroupError() {
+      Notify.create({
+        message: 'Erreur validation',
+        icon: 'lock',
+        timeout: 2500,
+      });
+    },
     addGroup() {
       // Appel API validation
-      console.log(`Validation ${this.form.groupSelect.id} / ${this.form.groupSelect.name}`);
+      const reqParams = {};
+      if (this.form.groupNew) reqParams.name = this.form.groupNew;
+      if (this.form.groupSelect.id) reqParams.id = this.form.groupSelect.id;
+      reqParams.usergroup = [];
+      this.form.users.forEach((idUser) => {
+        reqParams.usergroup.push({ id: idUser });
+      });
+
+      Http({
+        method: 'post',
+        url: API.endpoints.GROUPS_URL,
+        data: reqParams,
+      })
+        .then(() => {
+          this.$emit('hideFen');
+        })
+        .catch(() => {
+          this.addGroupError();
+        });
+    },
+    delGroup() {
+      // Appel API validation
+
+      if (this.form.groupSelect.id) {
+        const reqParams = {};
+        reqParams.id = this.form.groupSelect.id;
+
+        Http({
+          method: 'delete',
+          url: API.endpoints.GROUPS_URL,
+          data: reqParams,
+        })
+          .then(() => {
+            this.$emit('hideFen');
+          })
+          .catch(() => {
+            this.addGroupError();
+          });
+      }
     },
   },
 };

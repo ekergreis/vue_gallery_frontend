@@ -64,9 +64,12 @@
 
 <script>
 // CREATION USER
+import { Notify } from 'quasar';
 // Chargement règles de contrôle Vee-Validate
 import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
 import { required, email, confirmed } from 'vee-validate/dist/rules';
+import Http from 'axios';
+import API from '../api/routes';
 
 extend('required', {
   ...required,
@@ -101,9 +104,26 @@ export default {
     };
   },
   methods: {
+    addUserError() {
+      Notify.create({
+        message: 'Erreur création',
+        icon: 'lock',
+        timeout: 2500,
+      });
+    },
     addUser() {
       // Appel API validation
-      console.log('Création');
+      Http({
+        method: 'post',
+        url: API.endpoints.USERS_ADD_URL,
+        params: this.form,
+      })
+        .then(() => {
+          this.$emit('hideFen');
+        })
+        .catch(() => {
+          this.addUserError();
+        });
     },
   },
 };

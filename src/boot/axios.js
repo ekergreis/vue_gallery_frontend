@@ -26,7 +26,7 @@ export default () => {
       // [OAUTH] Traitement du résultat de la requête si pb auth redirection
       if (error.response && (error.response.status === 401 || error.response.status === 403)) {
         self.$oauth.logout();
-        window.location.href = '/#/login';
+        this.$router.replace('/login');
       }
       return Promise.reject(error);
     },
