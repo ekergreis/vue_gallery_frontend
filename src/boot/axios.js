@@ -3,9 +3,8 @@ import axios from 'axios';
 
 Vue.prototype.$axios = axios;
 
-export default () => {
-  const self = Vue.prototype;
-
+// export default ({ app }) => {
+export default ({ app, store }) => {
   // [OAUTH] Fonctions interceptions reqûete et réponse Axios
   axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
@@ -13,7 +12,7 @@ export default () => {
   axios.interceptors.request.use(
     (config) => {
       // [OAUTH] Recherche oauth token à passer à la requête
-      config.headers.Authorization = self.$oauth.getAuthHeader();
+      config.headers.Authorization = store.getters['auth/getAuthHeader'];
       return config;
     },
     error => Promise.reject(error),
@@ -25,8 +24,8 @@ export default () => {
     (error) => {
       // [OAUTH] Traitement du résultat de la requête si pb auth redirection
       if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-        self.$oauth.logout();
-        this.$router.replace('/login');
+        // self.$oauth.logout();
+        app.router.replace('/login');
       }
       return Promise.reject(error);
     },

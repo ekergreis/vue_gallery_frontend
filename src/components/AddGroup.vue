@@ -45,7 +45,6 @@
 // GESTION GROUP
 import Http from 'axios';
 import { Notify } from 'quasar';
-import API from '../api/routes';
 
 export default {
   name: 'AddGroup',
@@ -91,7 +90,8 @@ export default {
   mounted() {
     // Chargement des infos groupes / users
     (async () => {
-      const response = await this.$oauth.getAPI(API.endpoints.GROUPS_URL);
+      const url = this.$store.getters['gallery/getRoute']('GROUPS_URL');
+      const response = await Http.get(url);
 
       // Chargement liste groupes existant
       this.lstGroup = [];
@@ -137,7 +137,7 @@ export default {
 
       Http({
         method: 'post',
-        url: API.endpoints.GROUPS_URL,
+        url: this.$store.getters['gallery/getRoute']('GROUPS_URL'),
         data: reqParams,
       })
         .then(() => {
@@ -148,15 +148,14 @@ export default {
         });
     },
     delGroup() {
-      // Appel API validation
-
+      // Appel API suppression
       if (this.form.groupSelect.id) {
         const reqParams = {};
         reqParams.id = this.form.groupSelect.id;
 
         Http({
           method: 'delete',
-          url: API.endpoints.GROUPS_URL,
+          url: this.$store.getters['gallery/getRoute']('GROUPS_URL'),
           data: reqParams,
         })
           .then(() => {

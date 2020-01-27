@@ -25,8 +25,8 @@ export default function (/* { ssrContext } */) {
     // for dev mode only
     strict: process.env.DEV,
 
-    // [OAUTH] plugin à appeler pour déclencher vuex-persistedstate
-    plugins: [createPersistedState()],
+    // [OAUTH] plugin à appeler pour déclencher vuex-persistedstate sur auth
+    plugins: [createPersistedState({ paths: ['auth'] })],
   });
   return store;
 }

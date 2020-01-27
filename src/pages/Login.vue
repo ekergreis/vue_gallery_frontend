@@ -50,7 +50,7 @@ export default
     async authenticate() {
       try {
         // [OAUTH] Authentification avec user et mot de passe
-        await this.$oauth.login(this.form.username, this.form.password);
+        await this.$store.dispatch('auth/login', { username: this.form.username, password: this.form.password });
         // [OAUTH] Succès Authentification
         this.$router.replace('/');
       } catch (error) {

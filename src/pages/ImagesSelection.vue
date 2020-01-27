@@ -13,7 +13,6 @@
 // GESTION AFFICHAGE D'UNE SELECTION IMAGES (BEST-OF)
 import Images from 'components/Images';
 import Http from 'axios';
-import API from '../api/routes';
 
 export default {
   name: 'Galerie',
@@ -53,14 +52,14 @@ export default {
       this.galerieImages = [];
       Http({
         method: 'post',
-        url: API.endpoints.GALERIE_URL,
+        url: this.$store.getters['gallery/getRoute']('IMG_URL'),
         data: this.dataParams,
         headers: { 'Content-Type': 'application/json' },
       })
         .then((response) => {
           this.galerieImages = [];
           response.data.img.forEach((image) => {
-            const baseURL = `${API.IMG_URL}${image.dir}/`;
+            const baseURL = `${this.$store.getters['gallery/getStorage']}${image.dir}/`;
             this.galerieImages.push({
               id: image.id,
               src: `${baseURL}${image.mini_filename}`,

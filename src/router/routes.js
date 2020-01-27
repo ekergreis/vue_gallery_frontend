@@ -13,7 +13,7 @@ const routes = [
         meta: { requiresAdmin: false },
       },
       {
-        path: '/galerie/:id',
+        path: '/galerie/:id?',
         name: 'galerie',
         component: () => import('pages/Galerie.vue'),
         meta: { requiresAdmin: false },

@@ -40,7 +40,7 @@
           </q-item-section>
         </q-item>
 
-        <q-item tag="a" to="/add_galerie">
+        <q-item tag="a" to="/galerie">
           <q-item-section avatar>
             <q-icon name="add_photo_alternate" />
           </q-item-section>
@@ -95,9 +95,9 @@
 
 <script>
 import { Notify } from 'quasar';
+import Http from 'axios';
 import AddUser from 'components/AddUser';
 import AddGroup from 'components/AddGroup';
-import API from '../api/routes';
 
 export default {
   name: 'MyLayout',
@@ -108,7 +108,6 @@ export default {
   data() {
     return {
       leftDrawerOpen: false,
-      APIRoutes: API,
       user: '',
       detMenu: '',
 
@@ -119,19 +118,22 @@ export default {
   mounted() {
     // Chargement des infos générales (galeries)
     (async () => {
-      const response = await this.$oauth.getAPI(API.endpoints.MENU_URL);
+      const url = this.$store.getters['gallery/getRoute']('GALERIE_URL');
+      const response = await Http.get(url);
+
       this.user = response.data.Util;
       if (this.user === '') this.logout();
 
       this.detMenu = response.data.Galeries;
 
+      this.$store.commit('gallery/setGroups', response.data.Groups);
       this.$store.commit('gallery/setImgSelect', response.data.BestImgs);
     })();
   },
   computed: {
     // Indicateur du role pour afficher boutons ajouter utilisateur ou groupe
     affBtnAdmin() {
-      return this.$oauth.isAdmin();
+      return this.$store.getters['auth/roleAuth'];
     },
     // Indicateur d'affichage de la fenêtre gestion de comptes ou groupes
     affFenComptes: {
@@ -156,7 +158,7 @@ export default {
       });
       setTimeout(() => {
         // [OAUTH] Déconnexion
-        this.$oauth.logout();
+        this.$store.dispatch('auth/logout');
         // [OAUTH] Redirection vers route Login
         this.$router.replace('/login');
       }, timeout);

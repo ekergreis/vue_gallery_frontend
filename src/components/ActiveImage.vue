@@ -34,7 +34,6 @@
 // GESTION AFFICHAGE D'UNE IMAGE
 import Comment from 'components/Comment';
 import Http from 'axios';
-import API from '../api/routes';
 
 export default {
   name: 'ActiveImage',
@@ -123,7 +122,7 @@ export default {
 
       Http({
         method: 'get',
-        url: API.endpoints.COMMENTS_URL,
+        url: this.$store.getters['gallery/getRoute']('COMMENTS_URL'),
         params: dataParams,
       })
         .then((response) => {

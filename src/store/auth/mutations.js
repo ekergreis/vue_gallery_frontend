@@ -3,7 +3,6 @@
 export const setToken = (state, val) => {
   state.access_token = val;
 };
-
-export const setGroup = (state, val) => {
-  state.group = val;
+export const setRole = (state, val) => {
+  state.role = val;
 };

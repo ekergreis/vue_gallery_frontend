@@ -69,7 +69,6 @@ import { Notify } from 'quasar';
 import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
 import { required, email, confirmed } from 'vee-validate/dist/rules';
 import Http from 'axios';
-import API from '../api/routes';
 
 extend('required', {
   ...required,
@@ -115,7 +114,7 @@ export default {
       // Appel API validation
       Http({
         method: 'post',
-        url: API.endpoints.USERS_ADD_URL,
+        url: this.$store.getters['gallery/getRoute']('USERS_ADD_URL'),
         params: this.form,
       })
         .then(() => {
