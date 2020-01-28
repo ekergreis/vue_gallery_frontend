@@ -8,5 +8,7 @@ export function roleAuth(state) {
   return false;
 }
 export function getAuthHeader(state) {
-  return `${state.oauth_type} ${state.access_token}`; // [OAUTH] Exemple : Bearer xk8dfwv8783dxddjk232xjshoqpx
+  let authHeader = null;
+  if (state.access_token !== '') authHeader = `${state.oauth_type} ${state.access_token}`; // [OAUTH] Exemple : Bearer xk8dfwv8783dxddjk232xjshoqpx
+  return authHeader;
 }

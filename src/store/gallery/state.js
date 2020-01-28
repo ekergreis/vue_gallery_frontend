@@ -10,12 +10,12 @@ export default {
   },
   API_ROUTES: {
     LOGIN: 'login',
+    LOGOUT: 'logout',
     GALERIE_URL: 'galeries',
     USERS_ADD_URL: 'signup',
     GROUPS_URL: 'groups',
     IMG_URL: 'images',
     IMG_UPLOAD_URL: 'image_upload',
     COMMENTS_URL: 'comments',
-    LOGOUT_URL: 'logout',
   },
 };

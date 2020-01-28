@@ -30,7 +30,7 @@ export default {
     dataParams() {
       // Actualisation suivant vuex store gallery img_select
       const $imgSelect = {};
-      $imgSelect.img = this.$store.getters['gallery/getImgSelect'];
+      $imgSelect.img = this.$store.state.gallery.img_select;
       return JSON.stringify($imgSelect);
     },
   },
@@ -59,7 +59,7 @@ export default {
         .then((response) => {
           this.galerieImages = [];
           response.data.img.forEach((image) => {
-            const baseURL = `${this.$store.getters['gallery/getStorage']}${image.dir}/`;
+            const baseURL = `${this.$store.state.gallery.URL_IMG}${image.dir}/`;
             this.galerieImages.push({
               id: image.id,
               src: `${baseURL}${image.mini_filename}`,

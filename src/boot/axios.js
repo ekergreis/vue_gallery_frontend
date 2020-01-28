@@ -12,7 +12,8 @@ export default ({ app, store }) => {
   axios.interceptors.request.use(
     (config) => {
       // [OAUTH] Recherche oauth token à passer à la requête
-      config.headers.Authorization = store.getters['auth/getAuthHeader'];
+      const authHeader = store.getters['auth/getAuthHeader'];
+      if (authHeader) config.headers.Authorization = store.getters['auth/getAuthHeader'];
       return config;
     },
     error => Promise.reject(error),
@@ -24,7 +25,7 @@ export default ({ app, store }) => {
     (error) => {
       // [OAUTH] Traitement du résultat de la requête si pb auth redirection
       if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-        // self.$oauth.logout();
+        store.dispatch('auth/logout');
         app.router.replace('/login');
       }
       return Promise.reject(error);

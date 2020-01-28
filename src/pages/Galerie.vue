@@ -2,34 +2,39 @@
   <q-page padding class="row justify-center">
     <div class="col">
       <div>
-        <div class="text-h5 text-center">
-          {{ nomGalerie }}
-          <q-input v-if="idGalerie === null" outlined v-model="form.name" label="Nom Galerie"
-                   dense class="q-pb-xs"  />
+
+        <div v-if="idGalerie !== null">
+          <div class="text-h5 text-center" >{{ form.name }}</div>
+          <div class="text-subtitle1 text-center" >{{ periodeGalerie }}</div>
+          <div class="text-body2 text-italic text-center">{{ form.descript }}</div>
         </div>
-        <div class="text-subtitle1 text-center">
-          {{ periodeGalerie }}
-          <div v-if="idGalerie === null" class="row float">
-            <div style="padding: 10px 10px 0 0;">Période du</div>
-            <date-picker v-model="form.dateDeb" />
-            <div style="padding: 10px 10px 0 10px;">au</div>
-            <date-picker v-model="form.dateFin" />
+
+        <div v-else>
+          <div>
+            <q-input outlined v-model="form.name" label="Nom Galerie" dense class="q-pb-xs"  />
           </div>
-        </div>
-        <div class="text-body2 text-italic text-center">
-          {{ descriptGalerie }}
-          <q-input v-if="idGalerie === null" outlined v-model="form.descript" label="Description"
-                   type="textarea" :rows="3" dense class="q-pb-xs"  />
-        </div>
-        <div v-if="idGalerie === null" class="q-pa-xs">
-          <q-option-group
-            v-model="form.group"
-            :options="lstGroup"
-            color="green" type="toggle" dense
-          />
-        </div>
-        <div v-if="idGalerie === null" style="padding: 10px 0 30px 0;">
-          <q-btn @click="createGalerie()">Créer la galerie</q-btn>
+          <div>
+            <div class="row float">
+              <div style="padding: 10px 10px 0 0;">Période du</div>
+              <date-picker v-model="form.dateDeb" disable readonly />
+              <div style="padding: 10px 10px 0 10px;">au</div>
+              <date-picker v-model="form.dateFin" />
+            </div>
+          </div>
+          <div>
+            <q-input outlined v-model="form.descript" label="Description"
+                     type="textarea" :rows="3" dense class="q-pb-xs"  />
+          </div>
+          <div>
+            <q-option-group
+              v-model="form.group"
+              :options="lstGroup"
+              color="green" type="toggle" dense
+            />
+          </div>
+          <div style="padding: 10px 0 30px 0;">
+            <q-btn @click="createGalerie()">Créer la galerie</q-btn>
+          </div>
         </div>
       </div>
 
@@ -60,6 +65,7 @@
 // GESTION AFFICHAGE D'UNE GALERIE
 import Images from 'components/Images';
 import DatePicker from 'components/DatePicker';
+import { mapState } from 'vuex';
 import Http from 'axios';
 
 export default {
@@ -72,16 +78,11 @@ export default {
     return {
       idGalerie: null,
       galerieImages: [],
-      lstGroup: [],
-      nomGalerie: '',
-      descriptGalerie: '',
+
       periodeGalerie: '',
       groupesGalerie: '',
       pluriel: '',
-      loading: true,
-      errored: false,
-      affFormNewGalerie: false,
-      affUploadImages: false,
+
       form: {
         name: '',
         dateDeb: '',
@@ -89,11 +90,15 @@ export default {
         descript: '',
         group: [],
       },
+
+      loading: true,
+      errored: false,
+      affFormNewGalerie: false,
+      affUploadImages: false,
     };
   },
   // CHARGEMENT INITIAL
   mounted() {
-    this.lstGroup = this.$store.getters['gallery/getGroups'];
     if (this.$route.params.id) {
       this.ChargeGalerie();
     }
@@ -109,14 +114,24 @@ export default {
       }
     },
   },
+  computed: {
+    ...mapState({
+      lstGroup: state => state.gallery.groups,
+    }),
+  },
   methods: {
     // INITIALISATION GALERIE
     InitVar() {
       this.idGalerie = null;
       this.affFormNewGalerie = false;
+
+      this.form.name = '';
+      this.form.descript = '';
+      this.form.dateDeb = '';
+      this.form.dateFin = '';
+      this.form.group = [];
+
       this.galerieImages = [];
-      this.nomGalerie = '';
-      this.descriptGalerie = '';
       this.periodeGalerie = '';
       this.groupesGalerie = '';
       this.affUploadImages = false;
@@ -136,11 +151,12 @@ export default {
       })
         .then((response) => {
           // Infos Galerie
-          this.nomGalerie = response.data.name;
-          this.descriptGalerie = response.data.description;
-          if (response.data.date_start !== '' && response.data.date_end !== '') {
-            this.periodeGalerie = `${response.data.date_start} au ${response.data.date_end}`;
-          }
+          this.form.name = response.data.name;
+          this.form.descript = response.data.description;
+          this.form.dateDeb = response.data.date_start;
+          this.form.dateFin = response.data.date_end;
+          this.constructPeriode();
+
           response.data.groups.forEach((group) => {
             if (this.groupesGalerie !== '') {
               this.pluriel = 's';
@@ -150,17 +166,19 @@ export default {
           });
 
           // Infos Images
-          response.data.img.forEach((image) => {
-            const baseURL = `${this.$store.getters['gallery/getStorage']}${image.dir}/`;
-            this.galerieImages.push({
-              id: image.id,
-              src: `${baseURL}${image.mini_filename}`,
-              srcFull: `${baseURL}${image.filename}`,
-              nbComment: image.comment_count,
-              nbLike: image.like_count,
-              Like: image.like_user,
+          if (response.data.img) {
+            response.data.img.forEach((image) => {
+              const baseURL = `${this.$store.state.gallery.URL_IMG}${image.dir}/`;
+              this.galerieImages.push({
+                id: image.id,
+                src: `${baseURL}${image.mini_filename}`,
+                srcFull: `${baseURL}${image.filename}`,
+                nbComment: image.comment_count,
+                nbLike: image.like_count,
+                Like: image.like_user,
+              });
             });
-          });
+          }
 
           this.affUploadImages = true;
         })
@@ -189,7 +207,10 @@ export default {
       Http.post(this.$store.getters['gallery/getRoute']('GALERIE_URL'), reqParams, {
         headers: { 'Content-Type': 'application/json' },
       }).then((response) => {
-        console.log(response);
+        // Actualisation page
+        this.constructPeriode();
+        this.idGalerie = response.data.id;
+        this.affUploadImages = true;
       });
     },
 
@@ -230,6 +251,14 @@ export default {
         reader.onload = () => resolve(reader.result);
         reader.onerror = error => reject(error);
       });
+    },
+    constructPeriode() {
+      this.periodeGalerie = '';
+      if (this.form.dateDeb !== '' && this.form.dateFin !== '') {
+        this.periodeGalerie = `${this.form.dateDeb} au ${this.form.dateFin}`;
+      } else if (this.form.dateDeb !== '' && (this.form.dateFin === '' || this.form.dateDeb === this.form.dateFin)) {
+        this.periodeGalerie = this.form.dateDeb;
+      }
     },
   },
 };

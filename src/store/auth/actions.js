@@ -22,8 +22,10 @@ export async function login(context, { username, password }) {
   }
 }
 export async function logout(context) {
-  const url = context.rootGetters[`${context.state.store_app}/getRoute`]('LOGOUT_URL');
-  await Http.get(url);
+  if (context.state.access_token !== '') {
+    const url = context.rootGetters[`${context.state.store_app}/getRoute`]('LOGOUT');
+    await Http.get(url);
+  }
   context.commit('setToken', '');
-  this.store.commit('setRole', '');
+  context.commit('setRole', '');
 }
