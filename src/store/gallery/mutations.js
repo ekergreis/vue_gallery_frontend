@@ -11,3 +11,6 @@ export const setGroups = (state, val) => {
     });
   });
 };
+export const setNewGallery = (state, val) => {
+  state.new_gallery = val;
+};

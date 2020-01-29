@@ -93,7 +93,6 @@ export default {
 
       loading: true,
       errored: false,
-      affFormNewGalerie: false,
       affUploadImages: false,
     };
   },
@@ -101,17 +100,18 @@ export default {
   mounted() {
     if (this.$route.params.id) {
       this.ChargeGalerie();
+    } else {
+      this.selectAllGroup();
     }
   },
   // RECHARGEMENT PAGE SUITE APPEL ROUTER
   watch: {
     $route() {
       this.InitVar();
-      if (this.$route.params.id) {
-        this.ChargeGalerie();
-      } else {
-        this.affFormNewGalerie = true;
-      }
+      if (this.$route.params.id) this.ChargeGalerie();
+    },
+    lstGroup() {
+      this.selectAllGroup();
     },
   },
   computed: {
@@ -123,7 +123,6 @@ export default {
     // INITIALISATION GALERIE
     InitVar() {
       this.idGalerie = null;
-      this.affFormNewGalerie = false;
 
       this.form.name = '';
       this.form.descript = '';
@@ -135,6 +134,8 @@ export default {
       this.periodeGalerie = '';
       this.groupesGalerie = '';
       this.affUploadImages = false;
+
+      this.selectAllGroup();
     },
 
     // CHARGEMENT GALERIE
@@ -151,36 +152,38 @@ export default {
       })
         .then((response) => {
           // Infos Galerie
-          this.form.name = response.data.name;
-          this.form.descript = response.data.description;
-          this.form.dateDeb = response.data.date_start;
-          this.form.dateFin = response.data.date_end;
-          this.constructPeriode();
+          if (this.$route.params.id) {
+            this.form.name = response.data.name;
+            this.form.descript = response.data.description;
+            this.form.dateDeb = response.data.date_start;
+            this.form.dateFin = response.data.date_end;
+            this.constructPeriode();
 
-          response.data.groups.forEach((group) => {
-            if (this.groupesGalerie !== '') {
-              this.pluriel = 's';
-              this.groupesGalerie = `${this.groupesGalerie}, `;
-            }
-            this.groupesGalerie = `${this.groupesGalerie}${group}`;
-          });
-
-          // Infos Images
-          if (response.data.img) {
-            response.data.img.forEach((image) => {
-              const baseURL = `${this.$store.state.gallery.URL_IMG}${image.dir}/`;
-              this.galerieImages.push({
-                id: image.id,
-                src: `${baseURL}${image.mini_filename}`,
-                srcFull: `${baseURL}${image.filename}`,
-                nbComment: image.comment_count,
-                nbLike: image.like_count,
-                Like: image.like_user,
-              });
+            response.data.groups.forEach((group) => {
+              if (this.groupesGalerie !== '') {
+                this.pluriel = 's';
+                this.groupesGalerie = `${this.groupesGalerie}, `;
+              }
+              this.groupesGalerie = `${this.groupesGalerie}${group}`;
             });
-          }
 
-          this.affUploadImages = true;
+            // Infos Images
+            if (response.data.img) {
+              response.data.img.forEach((image) => {
+                const baseURL = `${this.$store.state.gallery.URL_IMG}${image.dir}/`;
+                this.galerieImages.push({
+                  id: image.id,
+                  src: `${baseURL}${image.mini_filename}`,
+                  srcFull: `${baseURL}${image.filename}`,
+                  nbComment: image.comment_count,
+                  nbLike: image.like_count,
+                  Like: image.like_user,
+                });
+              });
+            }
+
+            this.affUploadImages = true;
+          }
         })
         .catch((error) => {
           console.log(error);
@@ -193,7 +196,6 @@ export default {
 
     // CREATION GALERIE
     createGalerie() {
-      console.log(this.form.dateDeb);
       const reqParams = {
         name: this.form.name,
         descript: this.form.descript,
@@ -207,10 +209,8 @@ export default {
       Http.post(this.$store.getters['gallery/getRoute']('GALERIE_URL'), reqParams, {
         headers: { 'Content-Type': 'application/json' },
       }).then((response) => {
-        // Actualisation page
-        this.constructPeriode();
-        this.idGalerie = response.data.id;
-        this.affUploadImages = true;
+        // Modif vuex store pour actualisation menu et page
+        this.$store.commit('gallery/setNewGallery', response.data.id);
       });
     },
 
@@ -259,6 +259,11 @@ export default {
       } else if (this.form.dateDeb !== '' && (this.form.dateFin === '' || this.form.dateDeb === this.form.dateFin)) {
         this.periodeGalerie = this.form.dateDeb;
       }
+    },
+    selectAllGroup() {
+      this.lstGroup.forEach((group) => {
+        this.form.group.push(group.value);
+      });
     },
   },
 };

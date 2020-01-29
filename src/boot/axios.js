@@ -25,7 +25,10 @@ export default ({ app, store }) => {
     (error) => {
       // [OAUTH] Traitement du résultat de la requête si pb auth redirection
       if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-        store.dispatch('auth/logout');
+        // Verif pour éviter boucle appels logout si retour 401 ou 403
+        if (!error.config.url.includes(store.getters['gallery/getRoute']('LOGOUT'))) {
+          store.dispatch('auth/logout');
+        }
         app.router.replace('/login');
       }
       return Promise.reject(error);

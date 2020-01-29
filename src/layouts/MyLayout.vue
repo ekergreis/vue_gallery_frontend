@@ -30,7 +30,8 @@
       content-class="bg-grey-2"
     >
       <q-list>
-        <q-item clickable tag="a" to="/">
+        <q-item clickable v-ripple :to="{ name: 'img_selection'}" exact
+                :active="link === 'img_selection'" @click="link = 'img_selection'" >
           <q-item-section avatar>
             <q-icon name="first_page" />
           </q-item-section>
@@ -40,7 +41,8 @@
           </q-item-section>
         </q-item>
 
-        <q-item tag="a" to="/galerie">
+        <q-item clickable v-ripple :to="{ name: 'galerie'}" exact
+                :active="link === 'galerie'" @click="link = 'galerie'">
           <q-item-section avatar>
             <q-icon name="add_photo_alternate" />
           </q-item-section>
@@ -50,8 +52,9 @@
           </q-item-section>
         </q-item>
 
-        <q-item v-for="(item, index) in detMenu" :key="index"
-          tag="a" :to="{ name: 'galerie', params: { id: item.id }}">
+        <q-item v-for="(item, index) in detMenu" :key="index" exact
+                clickable v-ripple :to="{ name: 'galerie', params: { id: item.id }}"
+                :active="link === `galerie/${item.id}`" @click="link = 'galerie/${item.id}'">
           <q-item-section>
             <q-item-label>{{ item.name }}</q-item-label>
             <q-item-label caption>{{ item.date_start }} au {{ item.date_end }}</q-item-label>
@@ -96,6 +99,7 @@
 <script>
 import { Notify } from 'quasar';
 import Http from 'axios';
+import { mapState } from 'vuex';
 import AddUser from 'components/AddUser';
 import AddGroup from 'components/AddGroup';
 
@@ -107,9 +111,10 @@ export default {
   },
   data() {
     return {
+      link: '',
       leftDrawerOpen: false,
       user: '',
-      detMenu: '',
+      detMenu: null,
 
       affUser: false,
       affGroup: false,
@@ -117,20 +122,13 @@ export default {
   },
   mounted() {
     // Chargement des infos générales (galeries)
-    (async () => {
-      const url = this.$store.getters['gallery/getRoute']('GALERIE_URL');
-      const response = await Http.get(url);
-
-      this.user = response.data.Util;
-      if (this.user === '') this.logout();
-
-      this.detMenu = response.data.Galeries;
-
-      this.$store.commit('gallery/setGroups', response.data.Groups);
-      this.$store.commit('gallery/setImgSelect', response.data.BestImgs);
-    })();
+    this.chargeMenu();
   },
   computed: {
+    // Detect demande rechargement menu
+    ...mapState({
+      new_gallery: state => state.gallery.new_gallery,
+    }),
     // Indicateur du role pour afficher boutons ajouter utilisateur ou groupe
     affBtnAdmin() {
       return this.$store.getters['auth/roleAuth'];
@@ -145,6 +143,11 @@ export default {
         this.affUser = false;
         this.affGroup = false;
       },
+    },
+  },
+  watch: {
+    new_gallery(idGallery) {
+      this.chargeMenu(idGallery);
     },
   },
   methods: {
@@ -167,6 +170,23 @@ export default {
     hideFenComptes() {
       this.affUser = false;
       this.affGroup = false;
+    },
+    async chargeMenu(idGallery = null) {
+      this.detMenu = null;
+      const url = this.$store.getters['gallery/getRoute']('GALERIE_URL');
+      const response = await Http.get(url);
+
+      this.user = response.data.Util;
+      if (this.user === '') this.logout();
+
+      this.detMenu = response.data.Galeries;
+
+      this.$store.commit('gallery/setGroups', response.data.Groups);
+      this.$store.commit('gallery/setImgSelect', response.data.BestImgs);
+
+      if (idGallery !== null) {
+        this.$router.replace(`/galerie/${idGallery}`);
+      }
     },
   },
 };

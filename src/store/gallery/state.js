@@ -1,7 +1,4 @@
 export default {
-  img_select: {},
-  groups: [],
-
   URL_API: 'http://www.laravel_gallery.local/api/',
   URL_IMG: 'http://www.laravel_gallery.local/storage/galeries_images/',
   API_SECRET: {
@@ -18,4 +15,8 @@ export default {
     IMG_UPLOAD_URL: 'image_upload',
     COMMENTS_URL: 'comments',
   },
+
+  img_select: {},
+  groups: [],
+  new_gallery: null,
 };

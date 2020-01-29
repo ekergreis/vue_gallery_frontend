@@ -21,10 +21,10 @@ export async function login(context, { username, password }) {
     return Promise.reject(error);
   }
 }
-export async function logout(context) {
+export function logout(context) {
   if (context.state.access_token !== '') {
     const url = context.rootGetters[`${context.state.store_app}/getRoute`]('LOGOUT');
-    await Http.get(url);
+    Http.get(url);
   }
   context.commit('setToken', '');
   context.commit('setRole', '');
