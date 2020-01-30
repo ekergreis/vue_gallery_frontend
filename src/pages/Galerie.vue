@@ -228,8 +228,20 @@ export default {
             Http.post(this.$store.getters['gallery/getRoute']('IMG_UPLOAD_URL'), data, {
               headers: { 'Content-Type': 'application/json' },
             }).then((response) => {
-              console.log(response);
               this.$refs.uploadcomponent.removeFile(image);
+
+              // Affichage image dans galerie
+              if (response.data.id > 0) {
+                const baseURL = `${this.$store.state.gallery.URL_IMG}${response.data.dir}/`;
+                this.galerieImages.push({
+                  id: response.data.id,
+                  src: `${baseURL}${response.data.mini_filename}`,
+                  srcFull: `${baseURL}${response.data.filename}`,
+                  nbComment: 0,
+                  nbLike: 0,
+                  Like: false,
+                });
+              }
             });
           }, 4000);
         }).catch(() => {
